@@ -1,0 +1,40 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local BridgeNet = ReplicatedStorage:WaitForChild("BridgeNet2")
+local Remote = BridgeNet:WaitForChild("dataRemoteEvent")
+
+local Config = {
+    Action = "Right Punch",
+    KeyCode = "\014",
+    Debug = false,
+}
+
+local function ValidatePayload(action, keyCode)
+    assert(type(action) == "string", "Action must be a string")
+    assert(type(keyCode) == "string", "KeyCode must be a string")
+
+    return {
+        [1] = action,
+        [2] = keyCode,
+    }
+end
+
+local function CreateArguments(payload)
+    return {
+        [1] = payload,
+        n = 1,
+    }
+end
+
+local function SendRequest(action, keyCode)
+    local payload = ValidatePayload(action, keyCode)
+    local args = CreateArguments(payload)
+
+    if Config.Debug then
+        print("Sending action:", action)
+    end
+
+    Remote:FireServer(unpack(args, 1, args.n))
+end
+
+SendRequest(Config.Action, Config.KeyCode)
